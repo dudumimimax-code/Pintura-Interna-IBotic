@@ -1,189 +1,128 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
 <title>Pintura Interna IBotic</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
 <style>
-/* Layout: painel de diretoria em 2 partes grandes; cada etapa tem texto à esquerda e carrossel com swipe à direita */
-:root{
-  --bg:#eceff0; --surface:#f8f9f9; --ink:#15191c; --muted:#58646b; --line:#cfd6d9;
-  --accent:#0d5c63; --accent-ink:#ffffff; --tint:#dcebec; --stage:#e3e8ea;
-  --f-display:"Cormorant Garamond","Times New Roman",serif;
-  --f-body:"IBM Plex Sans",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#121618; --surface:#1b2124; --ink:#e8eced; --muted:#9aa8ae; --line:#2f3a3f;
-  --accent:#58b4bb; --accent-ink:#0c1315; --tint:#1e3033; --stage:#0f1315; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#121618; --surface:#1b2124; --ink:#e8eced; --muted:#9aa8ae; --line:#2f3a3f;
-  --accent:#58b4bb; --accent-ink:#0c1315; --tint:#1e3033; --stage:#0f1315; color-scheme:dark}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);
-  padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-h1,h2,h3{margin:0;text-wrap:balance}
-.eyebrow{font:500 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-header{padding-bottom:14px;border-bottom:2px solid var(--ink)}
-h1{font:600 clamp(32px,4.8vw,52px)/1 var(--f-display);letter-spacing:-.01em;margin-top:6px}
-.lede{max-width:70ch;margin:8px 0 0;color:var(--muted)}
-.band{background:var(--surface);border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:22px}
-.band-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
-h2{font:600 30px/1.05 var(--f-display)}
-.band-h p{margin:0;color:var(--muted);font-size:13px}
-.stage{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start;padding-top:20px;border-top:1px solid var(--line)}
-.stage:first-of-type{border-top:0;padding-top:0}
-.txt{display:flex;flex-direction:column;gap:10px;min-width:0}
-.txt h3{font:600 17px/1.2 var(--f-body);display:flex;gap:10px;align-items:center}
-.txt h3 i{font:500 12px var(--f-mono);font-style:normal;background:var(--ink);color:var(--bg);min-width:24px;height:24px;padding:0 6px;display:grid;place-items:center;flex:none}
-.txt h3 i.w{letter-spacing:.06em;text-transform:uppercase;font-size:11px}
-.txt ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
-.out{font-size:13.5px;background:var(--tint);padding:8px 12px;border-left:3px solid var(--accent)}
-.out b{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-right:6px}
-.txt p{margin:0}
-/* carrossel */
-.car{position:relative;min-width:0}
-.track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding-bottom:6px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-.slide{flex:0 0 auto;width:min(78%,300px);scroll-snap-align:start;margin:0;min-width:0}
-.slide.v{width:min(78%,260px)}
-.slide img,.slide video{display:block;width:100%;height:400px;object-fit:contain;background:var(--stage);border:1px solid var(--line)}
-.slide figcaption{font:400 11.5px/1.3 var(--f-mono);color:var(--muted);margin-top:5px}
-.nav{display:flex;align-items:center;gap:8px;margin-top:6px}
-.nav button{font:500 13px var(--f-mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);width:36px;height:32px;cursor:pointer}
-.nav button:hover{border-color:var(--accent);color:var(--accent)}
-.nav span{font:400 11px var(--f-mono);color:var(--muted)}
-.note{display:flex;flex-wrap:wrap;gap:6px 24px;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px}
-.note b{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);width:100%}
-.note span::before{content:"→ ";color:var(--accent)}
-footer{font:400 11px var(--f-mono);color:var(--muted)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media (max-width:900px){
-  .stage{grid-template-columns:1fr}
-  .slide img,.slide video{height:340px}
-}
-@media (prefers-reduced-motion:reduce){.track{scroll-behavior:auto}}
+body{margin:0;background:#eceff0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#15191c}
 </style>
+</helmet>
+<div style="max-width: 1240px; margin: 0 auto; box-sizing: border-box; padding: 32px 24px 48px; display: flex; flex-direction: column; gap: 24px; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #15191c; font-size: 15px; line-height: 1.5">
 
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Ornare · Teste de processo · Peça PARIS 2648PE</div>
-    <h1>Pintura interna na IBotic</h1>
-    <p class="lede">Teste da peça PARIS para validar preparação e pintura dentro da fábrica, mantendo o padrão Ornare: superfície uniforme e fresta de 5 mm preservada.</p>
-  </header>
-
-  <section class="band" aria-labelledby="h-proc">
-    <div class="band-h"><h2 id="h-proc">Parte 1 · Preparação da peça</h2><p>Dois passos antes da tinta. Deslize as fotos para ver a sequência.</p></div>
-
-    <div class="stage">
-      <div class="txt">
-        <h3><i>1</i>Lixação e pré-acabamento</h3>
-        <ul>
-          <li>A Destefani remove os riscos da Usinagem e uniformiza a superfície.</li>
-          <li>Lixa 2000 com a lixadeira rotopneumática nas bordas das molduras, para tirar farpas.</li>
-          <li>Lixas 1200 e depois 400, nos dois lados.</li>
-          <li>A peça chega com um "relevo" que fica insatisfatório na pintura. A causa raiz ainda precisa ser investigada.</li>
-        </ul>
-        <div class="out"><b>Resultado</b>Peças lixadas, prontas para pintar.</div>
-      </div>
-      <div class="car" data-car>
-        <div class="track">
-          <figure class="slide"><img src="media/img5.jpg" alt="Lixação na máquina Destefani" loading="lazy"><figcaption>Lixação na Destefani</figcaption></figure>
-          <figure class="slide"><img src="media/img12.jpg" alt="Relevo na peça" loading="lazy"><figcaption>Relevo da Usinagem (foto ilustrativa, modificada com IA)</figcaption></figure>
-          <figure class="slide"><img src="media/img10.jpg" alt="Lixa 2000 nas bordas" loading="lazy"><figcaption>Lixa 2000 nas bordas</figcaption></figure>
-          <figure class="slide"><img src="media/img2.jpg" alt="Lixadeira rotopneumática" loading="lazy"><figcaption>Lixadeira rotopneumática</figcaption></figure>
-          <figure class="slide"><img src="media/img6.jpg" alt="Lixas 1200 e 400, lado 1" loading="lazy"><figcaption>Lixas 1200 e 400, lado 1</figcaption></figure>
-          <figure class="slide"><img src="media/img9.jpg" alt="Lixas 1200 e 400, lado 2" loading="lazy"><figcaption>Lixas 1200 e 400, lado 2</figcaption></figure>
-          <figure class="slide"><img src="media/img7.jpg" alt="Peça lixada" loading="lazy"><figcaption>Peça lixada, pronta para pintar</figcaption></figure>
-        </div>
-        <div class="nav"><button type="button" data-dir="-1" aria-label="Foto anterior">←</button><button type="button" data-dir="1" aria-label="Próxima foto">→</button><span>deslize ou use as setas</span></div>
-      </div>
-    </div>
-
-    <div class="stage">
-      <div class="txt">
-        <h3><i>2</i>Montagem e limpeza</h3>
-        <ul>
-          <li>Colocar as cavilhas nas laterais maiores.</li>
-          <li>Montar painel, laterais maiores e menores, com vão de 5 mm entre as laterais. Assim a pintura não gera relevo nos vãos.</li>
-          <li>Passar o bico de ar no lado que será pintado, para remover impurezas da superfície.</li>
-        </ul>
-        <div class="out"><b>Resultado</b>Peça montada, com vão aberto e limpa com o bico de ar.</div>
-      </div>
-      <div class="car" data-car>
-        <div class="track">
-          <figure class="slide"><img src="media/img14.jpg" alt="Cavilhas nas laterais maiores" loading="lazy"><figcaption>Cavilhas nas laterais maiores</figcaption></figure>
-          <figure class="slide"><img src="media/img16.jpg" alt="Montagem do painel" loading="lazy"><figcaption>Montagem do painel</figcaption></figure>
-          <figure class="slide"><img src="media/img17.jpg" alt="Vão de 5 mm entre molduras" loading="lazy"><figcaption>Vão de 5 mm entre as molduras</figcaption></figure>
-          <figure class="slide"><img src="media/img11.jpg" alt="Limpeza com bico de ar" loading="lazy"><figcaption>Limpeza com bico de ar</figcaption></figure>
-        </div>
-        <div class="nav"><button type="button" data-dir="-1" aria-label="Foto anterior">←</button><button type="button" data-dir="1" aria-label="Próxima foto">→</button><span>deslize ou use as setas</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="band" aria-labelledby="h-paint">
-    <div class="band-h"><h2 id="h-paint">Parte 2 · Pintura na IBotic</h2><p>Etapa principal, ainda em ajuste. Na 2ª amostra foi regulado o bico de saída de tinta.</p></div>
-
-    <div class="stage">
-      <div class="txt">
-        <h3><i class="w">Início</i>A máquina e os parâmetros</h3>
-        <p>A IBotic é a máquina de pintura da fábrica. A peça entra pela esteira e é pintada dentro de uma câmara, por um cabeçote com bicos que se desloca sobre ela. Os parâmetros são ajustados no painel antes de cada pintura.</p>
-        <div class="out"><b>Atenção</b>Os parâmetros ainda precisam ser aperfeiçoados; não há receita fixa para esta peça.</div>
-      </div>
-      <div class="car" data-car>
-        <div class="track">
-          <figure class="slide"><img src="media/img8.jpg" alt="Máquina IBotic" loading="lazy"><figcaption>Máquina IBotic</figcaption></figure>
-          <figure class="slide"><img src="media/img3.jpg" alt="Painel de parâmetros da IBotic" loading="lazy"><figcaption>Painel de parâmetros</figcaption></figure>
-        </div>
-        <div class="nav"><button type="button" data-dir="-1" aria-label="Foto anterior">←</button><button type="button" data-dir="1" aria-label="Próxima foto">→</button><span>deslize ou use as setas</span></div>
-      </div>
-    </div>
-
-    <div class="stage">
-      <div class="txt">
-        <h3><i class="w">Meio</i>Peça na esteira e pintura</h3>
-        <p>A peça preparada é colocada na esteira. O vídeo mostra o cabeçote passando sobre a peça dentro da câmara de pintura.</p>
-      </div>
-      <div class="car" data-car>
-        <div class="track">
-          <figure class="slide"><img src="media/img13.jpg" alt="Peça na esteira" loading="lazy"><figcaption>Peça na esteira</figcaption></figure>
-          <figure class="slide v"><video controls playsinline muted preload="metadata" poster="media/frame_36.jpg" aria-label="Vídeo da pintura na IBotic"><source src="media/pintura.mp4" type="video/mp4"></video><figcaption>Vídeo da pintura na IBotic</figcaption></figure>
-        </div>
-        <div class="nav"><button type="button" data-dir="-1" aria-label="Anterior">←</button><button type="button" data-dir="1" aria-label="Próximo">→</button><span>deslize ou use as setas</span></div>
-      </div>
-    </div>
-
-    <div class="stage">
-      <div class="txt">
-        <h3><i class="w">Fim</i>Retirada e resultado</h3>
-        <p>Após a pintura, a peça é retirada com cuidado da câmara e deixada secando até poder pintar a outra face.</p>
-        <div class="out"><b>Resultado</b>Peça inteira pintada, com a fresta de 5 mm preservada.</div>
-      </div>
-      <div class="car" data-car>
-        <div class="track">
-          <figure class="slide"><img src="media/img4.jpg" alt="Retirada da peça da câmara" loading="lazy"><figcaption>Retirada da peça da câmara</figcaption></figure>
-          <figure class="slide"><img src="media/img1.jpg" alt="Peça pintada" loading="lazy"><figcaption>Resultado: peça pintada</figcaption></figure>
-          <figure class="slide"><img src="media/img18.jpg" alt="Vista geral da peça pintada" loading="lazy"><figcaption>Resultado: vista geral</figcaption></figure>
-          <figure class="slide"><img src="media/img15.jpg" alt="Vão de 5 mm preservado" loading="lazy"><figcaption>Vão de 5 mm preservado</figcaption></figure>
-        </div>
-        <div class="nav"><button type="button" data-dir="-1" aria-label="Foto anterior">←</button><button type="button" data-dir="1" aria-label="Próxima foto">→</button><span>deslize ou use as setas</span></div>
-      </div>
-    </div>
-  </section>
-
-  <footer>Fonte: Relatório Pintura Interna Teste, fotos e vídeo do teste na IBotic.</footer>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; border-bottom: 2px solid #15191c">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #58646b">Ornare · Teste de processo · Peça PARIS 2648PE</div>
+<h1 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 52px; line-height: 1; letter-spacing: -0.01em">Pintura interna na IBotic</h1>
+<p style="margin: 0; max-width: 70ch; color: #58646b">Teste da peça PARIS para validar preparação e pintura dentro da fábrica, mantendo o padrão Ornare: superfície uniforme e fresta de 5 mm preservada.</p>
 </div>
 
-<script>
-document.querySelectorAll('[data-car]').forEach(function(car){
-  var track=car.querySelector('.track');
-  car.querySelectorAll('button[data-dir]').forEach(function(b){
-    b.addEventListener('click',function(){
-      var s=track.querySelector('.slide');
-      var step=(s?s.getBoundingClientRect().width:280)+10;
-      track.scrollBy({left:step*Number(b.dataset.dir),behavior:'smooth'});
-    });
-  });
-});
-</script>
+<!-- PARTE 1 -->
+<div style="background: #f8f9f9; border: 1px solid #cfd6d9; padding: 24px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px">
+<h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 32px; line-height: 1.05">Parte 1 · Preparação da peça</h2>
+<p style="margin: 0; font-size: 13px; color: #58646b">Dois passos antes da tinta. Deslize as fotos para o lado.</p>
+</div>
 
-</body></html>
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<div style="flex: 1 1 280px; max-width: 340px; display: flex; flex-direction: column; gap: 12px">
+<h3 style="margin: 0; font-size: 17px; font-weight: 600">1 · Lixação e pré-acabamento</h3>
+<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px">
+<li>A Destefani remove os riscos da Usinagem e uniformiza a superfície.</li>
+<li>Lixa 2000 com a lixadeira rotopneumática nas bordas das molduras, para tirar farpas.</li>
+<li>Lixas 1200 e depois 400, nos dois lados.</li>
+<li>A peça chega com um "relevo" que fica insatisfatório na pintura. A causa raiz ainda precisa ser investigada.</li>
+</ul>
+<div style="font-size: 13.5px; background: #dcebec; padding: 8px 12px; border-left: 3px solid #0d5c63"><b style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #0d5c63; margin-right: 6px">Resultado</b>Peças lixadas, prontas para pintar.</div>
+</div>
+<div style="flex: 999 1 420px; min-width: 0; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px">
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/6614adeebd211226ff49f744d067ae32.jpg" alt="Lixação na máquina Destefani" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Lixação na Destefani</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/37ac68cbfbe6ee5f2cdd4063685f192f.jpg" alt="Relevo na peça" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Relevo da Usinagem (foto ilustrativa, modificada com IA)</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/d890d4dbfb548d929bb2316960e6cd69.jpg" alt="Lixa 2000 nas bordas" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Lixa 2000 nas bordas</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/f2a196c575d3a915140990cff9bcc9fc.jpg" alt="Lixadeira rotopneumática" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Lixadeira rotopneumática</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/4b8abf14603033446ceb3801a0a648ea.jpg" alt="Lixas 1200 e 400, lado 1" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Lixas 1200 e 400, lado 1</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/4e7006e3d22da5629076dd50ad9349e3.jpg" alt="Lixas 1200 e 400, lado 2" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Lixas 1200 e 400, lado 2</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/e13f3d17b9793553c024cccb907b2637.jpg" alt="Peça lixada" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Peça lixada, pronta para pintar</figcaption></figure>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding-top: 24px; border-top: 1px solid #cfd6d9">
+<div style="flex: 1 1 280px; max-width: 340px; display: flex; flex-direction: column; gap: 12px">
+<h3 style="margin: 0; font-size: 17px; font-weight: 600">2 · Montagem e limpeza</h3>
+<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px">
+<li>Colocar as cavilhas nas laterais maiores.</li>
+<li>Montar painel, laterais maiores e menores, com vão de 5 mm entre as laterais. Assim a pintura não gera relevo nos vãos.</li>
+<li>Passar o bico de ar no lado que será pintado, para remover impurezas da superfície.</li>
+</ul>
+<div style="font-size: 13.5px; background: #dcebec; padding: 8px 12px; border-left: 3px solid #0d5c63"><b style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #0d5c63; margin-right: 6px">Resultado</b>Peça montada, com vão aberto e limpa com o bico de ar.</div>
+</div>
+<div style="flex: 999 1 420px; min-width: 0; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px">
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/075a10d65f51bf1150a4b44fe9cd399f.jpg" alt="Cavilhas nas laterais maiores" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Cavilhas nas laterais maiores</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/33ab8145ce8cd7e9597313e7ad39822b.jpg" alt="Montagem do painel" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Montagem do painel</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/f031bbe3208effe81204a03aa948313d.jpg" alt="Vão de 5 mm entre molduras" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Vão de 5 mm entre as molduras</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/177a5d7cef47ff6bc5d6126011312e97.jpg" alt="Limpeza com bico de ar" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Limpeza com bico de ar</figcaption></figure>
+</div>
+</div>
+</div>
+
+<!-- PARTE 2 -->
+<div style="background: #f8f9f9; border: 1px solid #cfd6d9; padding: 24px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px">
+<h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 32px; line-height: 1.05">Parte 2 · Pintura na IBotic</h2>
+<p style="margin: 0; font-size: 13px; color: #58646b">Etapa principal, ainda em ajuste. Na 2ª amostra foi regulado o bico de saída de tinta.</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<div style="flex: 1 1 280px; max-width: 340px; display: flex; flex-direction: column; gap: 12px">
+<h3 style="margin: 0; font-size: 17px; font-weight: 600"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; background: #15191c; color: #eceff0; padding: 3px 8px; margin-right: 8px">Início</span>A máquina e os parâmetros</h3>
+<p style="margin: 0">A IBotic é a máquina de pintura da fábrica. A peça entra pela esteira e é pintada dentro de uma câmara, por um cabeçote com bicos que se desloca sobre ela. Os parâmetros são ajustados no painel antes de cada pintura.</p>
+<div style="font-size: 13.5px; background: #dcebec; padding: 8px 12px; border-left: 3px solid #0d5c63"><b style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #0d5c63; margin-right: 6px">Atenção</b>Os parâmetros ainda precisam ser aperfeiçoados; não há receita fixa para esta peça.</div>
+</div>
+<div style="flex: 999 1 420px; min-width: 0; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px">
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/2018c2a0ec9274d9d1f3408df608cbba.jpg" alt="Máquina IBotic" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Máquina IBotic</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/6a725d75ed2d169ee67af53bf5304965.jpg" alt="Painel de parâmetros da IBotic" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Painel de parâmetros</figcaption></figure>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding-top: 24px; border-top: 1px solid #cfd6d9">
+<div style="flex: 1 1 280px; max-width: 340px; display: flex; flex-direction: column; gap: 12px">
+<h3 style="margin: 0; font-size: 17px; font-weight: 600"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; background: #15191c; color: #eceff0; padding: 3px 8px; margin-right: 8px">Meio</span>Peça na esteira e pintura</h3>
+<p style="margin: 0">A peça preparada é colocada na esteira. O vídeo mostra o cabeçote passando sobre a peça dentro da câmara de pintura.</p>
+</div>
+<div style="flex: 999 1 420px; min-width: 0; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px">
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/e01f635f80cc68c1deb2ce090a14e84f.jpg" alt="Peça na esteira" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Peça na esteira</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 260px; scroll-snap-align: start"><video controls="" playsinline="" muted="" preload="metadata" poster="./assets/17ec7dcd49c3adab96c15c45c5144341.jpg" src="./assets/64b2d2bd88893d6ee23ca10e9c2ad297.mp4" style="display: block; width: 260px; height: 400px; object-fit: contain; background: #000; border: 1px solid #cfd6d9"></video><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Vídeo da pintura na IBotic</figcaption></figure>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding-top: 24px; border-top: 1px solid #cfd6d9">
+<div style="flex: 1 1 280px; max-width: 340px; display: flex; flex-direction: column; gap: 12px">
+<h3 style="margin: 0; font-size: 17px; font-weight: 600"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; background: #15191c; color: #eceff0; padding: 3px 8px; margin-right: 8px">Fim</span>Retirada e resultado</h3>
+<p style="margin: 0">Após a pintura, a peça é retirada com cuidado da câmara e deixada secando até poder pintar a outra face.</p>
+<div style="font-size: 13.5px; background: #dcebec; padding: 8px 12px; border-left: 3px solid #0d5c63"><b style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #0d5c63; margin-right: 6px">Resultado</b>Peça inteira pintada, com a fresta de 5 mm preservada.</div>
+</div>
+<div style="flex: 999 1 420px; min-width: 0; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px">
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/85a687ea60a876dc12bb100102287b25.jpg" alt="Retirada da peça da câmara" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Retirada da peça da câmara</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/b4cc93ba931534b1c16f2a8f3c46a4d1.jpg" alt="Peça pintada" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Resultado: peça pintada</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/e7d38f0f1a5c95649cba24cb6f5badbe.jpg" alt="Vista geral da peça pintada" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Resultado: vista geral</figcaption></figure>
+<figure style="margin: 0; flex: 0 0 280px; scroll-snap-align: start"><img src="./assets/fd4b20ec7181cceb0e2e187c20241acb.jpg" alt="Vão de 5 mm preservado" style="display: block; width: 280px; height: 400px; object-fit: contain; background: #e3e8ea; border: 1px solid #cfd6d9"><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #58646b; margin-top: 5px">Vão de 5 mm preservado</figcaption></figure>
+</div>
+</div>
+</div>
+
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #58646b">Fonte: Relatório Pintura Interna Teste, fotos e vídeo do teste na IBotic.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2350}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
